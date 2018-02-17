@@ -22,6 +22,8 @@ public class HttpRequestParserImpl implements HttpRequestParser {
         if(this.parsed) return request;
 
         try {
+            // try-with-resourcesでcloseすると、Socketまでcloseするので何もしない。
+            // InputStreamの取得元でcloseするようにする。
             BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
             readHeader(reader);
             readBody(reader);
