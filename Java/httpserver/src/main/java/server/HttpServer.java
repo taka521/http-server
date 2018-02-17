@@ -1,15 +1,13 @@
 package server;
 
 import server.api.HttpRequest;
-import server.parser.HttpRequestParser;
+import server.api.HttpRequestParser;
+import server.api.impl.HttpRequestParserImpl;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.CharBuffer;
 import java.util.logging.Logger;
 
 /**
@@ -46,7 +44,7 @@ public class HttpServer {
              Socket socket = server.accept();
              InputStream input = socket.getInputStream()) {
 
-            HttpRequest request = new HttpRequestParser(input).getHttpRequest();
+            HttpRequest request = HttpRequestParser.get().parse(input);
             System.out.println(request.getHeaderText());
             System.out.println(request.getBodyText());
         }

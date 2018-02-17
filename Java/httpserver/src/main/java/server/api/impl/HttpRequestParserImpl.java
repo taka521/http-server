@@ -1,29 +1,39 @@
-package server.parser;
+package server.api.impl;
 
 import server.api.HttpRequest;
+import server.api.HttpRequestParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class HttpRequestParser {
+public class HttpRequestParserImpl implements HttpRequestParser {
 
     private final HttpRequestImpl request;
+    private boolean parsed = false;
 
-    public HttpRequestParser(InputStream input) {
+    public HttpRequestParserImpl() {
         request = new HttpRequestImpl();
+    }
+
+    @Override
+    public HttpRequest parse(InputStream input) {
+        if(this.parsed) return request;
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
             readHeader(reader);
             readBody(reader);
+            this.parsed = true;
         } catch (IOException e) {
             // Nothing to do.
         }
+        return this.request;
     }
 
-    /** Httpリクエストを取得します。 */
-    public HttpRequest getHttpRequest() {
-        return request;
+    @Override
+    public boolean isParsed() {
+        return this.parsed;
     }
 
     /** リクエストヘッダの読み込み */
