@@ -2,10 +2,11 @@ package server;
 
 import server.api.HttpRequest;
 import server.api.HttpRequestParser;
-import server.api.impl.HttpRequestParserImpl;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
@@ -24,9 +25,6 @@ public class HttpServer {
     /** ポート番号 */
     private final int port;
 
-    /** サーバが実行中か */
-    private boolean running = false;
-
     private HttpServer(String host, int port) {
         this.host = host;
         this.port = port;
@@ -42,11 +40,16 @@ public class HttpServer {
 
         try (ServerSocket server = new ServerSocket(port);
              Socket socket = server.accept();
-             InputStream input = socket.getInputStream()) {
+             InputStream input = socket.getInputStream();
+             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
 
             HttpRequest request = HttpRequestParser.get().parse(input);
+
             System.out.println(request.getHeaderText());
             System.out.println(request.getBodyText());
+
+            writer.write("HTTP/1.1 200 OK\r\n");
+            writer.flush();
         }
 
         logger.info("=== server stop === ");

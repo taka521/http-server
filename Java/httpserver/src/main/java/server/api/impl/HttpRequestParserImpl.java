@@ -21,7 +21,8 @@ public class HttpRequestParserImpl implements HttpRequestParser {
     public HttpRequest parse(InputStream input) {
         if(this.parsed) return request;
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
+        try {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input, "UTF-8"));
             readHeader(reader);
             readBody(reader);
             this.parsed = true;
@@ -52,6 +53,7 @@ public class HttpRequestParserImpl implements HttpRequestParser {
         request.header = sb.toString();
     }
 
+
     /** リクエストボディの読み込み */
     private void readBody(BufferedReader reader) throws IOException {
         if (request.contentLength > 0) {
@@ -77,5 +79,6 @@ public class HttpRequestParserImpl implements HttpRequestParser {
             return this.body;
         }
     }
+
 
 }
