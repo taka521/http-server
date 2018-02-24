@@ -1,58 +1,78 @@
 package server;
 
-import server.api.HttpRequest;
-import server.api.HttpRequestParser;
+import server.parser.HttpRequestParser;
+import sun.tools.jconsole.Worker;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-/**
- * HttpServer
- */
 public class HttpServer {
 
-    /** ロガー */
     private static final Logger logger = Logger.getLogger(HttpServer.class.getName());
+    private static final int PORT = 8080;
+    private static final String CRLF = "\r\n";
 
-    /** ホスト名 */
-    private final String host;
+    private static ExecutorService service = Executors.newCachedThreadPool();
 
-    /** ポート番号 */
-    private final int port;
+    public static void start() throws IOException {
 
-    private HttpServer(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
+        logger.info("==== server start ====");
 
-    public static HttpServer init(String host, int port) {
-        return new HttpServer(host, port);
-    }
-
-    public void run() throws IOException {
-
-        logger.info("=== server start ===");
-
-        try (ServerSocket server = new ServerSocket(port);
-             Socket socket = server.accept();
-             InputStream input = socket.getInputStream();
-             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
-
-            HttpRequest request = HttpRequestParser.get().parse(input);
-
-            System.out.println(request.getHeaderText());
-            System.out.println(request.getBodyText());
-
-            writer.write("HTTP/1.1 200 OK\r\n");
-            writer.flush();
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            Socket socket;
+            while (true) {
+                socket = serverSocket.accept();
+                service.execute(new Worker(socket));
+            }
+        } catch (IOException e) {
+            logger.warning(e.getMessage());
         }
 
-        logger.info("=== server stop === ");
+        logger.info("==== server stop ====");
+    }
+
+    private static class Worker implements Runnable {
+
+        private final Socket socket;
+
+        Worker(final Socket socket) {
+            this.socket = socket;
+        }
+
+        @Override
+        public void run() {
+            if (socket == null) return;
+
+            try (final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+
+                new HttpRequestParser().parse(reader).ifPresent(request -> {
+                    System.out.println("[ThreadName:" + Thread.currentThread().getName() + "]");
+                    System.out.println(request);
+
+                    try {
+                        writer.write("HTTP/1.1 200 OK" + CRLF);
+                        writer.write(CRLF);
+                        writer.write(request.getBody().getMessage() + CRLF);
+                        writer.write("OK!!");
+                        writer.write(CRLF);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                });
+            } catch (IOException e) {
+                System.out.println(e);
+            }
+        }
     }
 
 }
