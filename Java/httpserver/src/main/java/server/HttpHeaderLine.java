@@ -24,6 +24,6 @@ public class HttpHeaderLine {
 
     @Override
     public String toString() {
-        return "key" + ": " +  values.stream().collect(Collectors.joining(", "));
+        return key + ": " +  values.stream().collect(Collectors.joining(", "));
     }
 }
