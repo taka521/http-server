@@ -1,10 +1,10 @@
 package server;
 
-public class HttpRequestBody {
+public class HttpMessageBody {
 
     private String message;
 
-    public HttpRequestBody(final String message) {
+    public HttpMessageBody(final String message) {
         this.message = message;
     }
 
@@ -14,6 +14,6 @@ public class HttpRequestBody {
 
     @Override
     public String toString() {
-        return "HttpRequestBody{" + "message='" + message + '\'' + '}';
+        return "HttpMessageBody{" + "message='" + message + '\'' + '}';
     }
 }

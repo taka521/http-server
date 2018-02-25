@@ -6,7 +6,7 @@ public class HttpRequest {
 
     private HttpRequestLine requestLine;
     private Map<String, HttpHeaderLine> headers;
-    private HttpRequestBody body;
+    private HttpMessageBody body;
 
     private HttpRequest(final Builder builder) {
         this.requestLine = builder.requestLine;
@@ -21,7 +21,7 @@ public class HttpRequest {
     public static class Builder {
         private HttpRequestLine requestLine;
         private Map<String, HttpHeaderLine> headers;
-        private HttpRequestBody body;
+        private HttpMessageBody body;
 
         public Builder setRequestLine(HttpRequestLine requestLine) {
             this.requestLine = requestLine;
@@ -33,7 +33,7 @@ public class HttpRequest {
             return this;
         }
 
-        public Builder setBody(HttpRequestBody body) {
+        public Builder setBody(HttpMessageBody body) {
             this.body = body;
             return this;
         }
@@ -51,7 +51,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public HttpRequestBody getBody() {
+    public HttpMessageBody getBody() {
         return body;
     }
 

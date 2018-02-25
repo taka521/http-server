@@ -2,6 +2,7 @@ package server;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HttpHeaderLine {
 
@@ -23,6 +24,6 @@ public class HttpHeaderLine {
 
     @Override
     public String toString() {
-        return "HttpHeaderLine{" + "key='" + key + '\'' + ", values=" + values + '}';
+        return "key" + ": " +  values.stream().collect(Collectors.joining(", "));
     }
 }

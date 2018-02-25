@@ -1,9 +1,9 @@
 package server.parser;
 
 import server.HttpHeaderLine;
+import server.HttpMessageBody;
 import server.HttpParser;
 import server.HttpRequest;
-import server.HttpRequestBody;
 import server.HttpRequestLine;
 
 import java.io.BufferedReader;
@@ -16,7 +16,7 @@ public class HttpRequestParser implements HttpParser<BufferedReader, Optional<Ht
 
     private static final HttpParser<String, HttpRequestLine> REQUEST_LINE_PARSE = new HttpRequestLineParser();
     private static final HttpParser<String, HttpHeaderLine> HEADER_LINE_PARSER = new HttpRequestHeaderLineParser();
-    private static final HttpParser<String, HttpRequestBody> REQUEST_BODY_PARSER = new HttpRequestBodyParser();
+    private static final HttpParser<String, HttpMessageBody> REQUEST_BODY_PARSER = new HttpRequestBodyParser();
 
     @Override
     public Optional<HttpRequest> parse(final BufferedReader in) {
@@ -43,7 +43,7 @@ public class HttpRequestParser implements HttpParser<BufferedReader, Optional<Ht
                 in.read(c);
                 sb.append(c);
             }
-            final HttpRequestBody body = new HttpRequestBody(sb.toString());
+            final HttpMessageBody body = new HttpMessageBody(sb.toString());
 
             // Httpリクエストの返却
             return Optional.of(

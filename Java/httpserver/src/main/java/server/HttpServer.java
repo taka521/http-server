@@ -1,6 +1,8 @@
 package server;
 
+import server.handler.GetHandler;
 import server.parser.HttpRequestParser;
+import server.parser.HttpResponseParser;
 import sun.tools.jconsole.Worker;
 
 import java.io.BufferedReader;
@@ -18,7 +20,6 @@ public class HttpServer {
 
     private static final Logger logger = Logger.getLogger(HttpServer.class.getName());
     private static final int PORT = 8080;
-    private static final String CRLF = "\r\n";
 
     private static ExecutorService service = Executors.newCachedThreadPool();
 
@@ -39,6 +40,7 @@ public class HttpServer {
         logger.info("==== server stop ====");
     }
 
+    // ワーカークラス
     private static class Worker implements Runnable {
 
         private final Socket socket;
@@ -51,26 +53,21 @@ public class HttpServer {
         public void run() {
             if (socket == null) return;
 
+            System.out.println("[Thread : " + Thread.currentThread().getName() + "]");
             try (final BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                  final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
 
                 new HttpRequestParser().parse(reader).ifPresent(request -> {
-                    System.out.println("[ThreadName:" + Thread.currentThread().getName() + "]");
-                    System.out.println(request);
-
                     try {
-                        writer.write("HTTP/1.1 200 OK" + CRLF);
-                        writer.write(CRLF);
-                        writer.write(request.getBody().getMessage() + CRLF);
-                        writer.write("OK!!");
-                        writer.write(CRLF);
+                        final HttpResponse response = new GetHandler().handle(request);
+                        writer.write(new HttpResponseParser().parse(response));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
                 });
             } catch (IOException e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
         }
     }

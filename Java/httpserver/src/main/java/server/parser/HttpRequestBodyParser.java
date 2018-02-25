@@ -1,13 +1,13 @@
 package server.parser;
 
+import server.HttpMessageBody;
 import server.HttpParser;
-import server.HttpRequestBody;
 
-public class HttpRequestBodyParser implements HttpParser<String, HttpRequestBody> {
+public class HttpRequestBodyParser implements HttpParser<String, HttpMessageBody> {
 
     @Override
-    public HttpRequestBody parse(String line) {
+    public HttpMessageBody parse(String line) {
         // 面倒なのでそのまま
-        return new HttpRequestBody(line);
+        return new HttpMessageBody(line);
     }
 }
